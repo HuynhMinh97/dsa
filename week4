@@ -1,0 +1,261 @@
+1/
+
+// STUDENT ANSWER BEGIN
+// You can define other functions here to help you.
+Node*minNode(Node*node)
+{
+    Node*a=node;
+    while(a && a->pLeft)
+    {
+    a=a->pLeft;
+    }
+    return a;
+}
+
+T getMin() {
+    return minNode(root)->value;
+    
+}
+Node*maxNode(Node*node)
+{
+    Node*a=node;
+    while(a && a->pRight)
+    {
+    a=a->pRight;
+    }
+    return a;
+}
+
+T getMax() {
+    return maxNode(root)->value;
+    
+}
+
+// STUDENT ANSWER END
+
+2/
+
+//Helping functions
+Node*addNode(Node*node,T value)
+{
+    if (node==NULL)
+    {
+        return new Node(value);
+    }
+    else if (node->value>value)
+    {
+        node->pLeft=addNode(node->pLeft,value);
+    }
+    else node->pRight=addNode(node->pRight,value);
+    return node;
+}
+
+void add(T value){
+    root=addNode(root,value);
+    
+}
+Node* minNode(Node*node)
+{
+    Node*a=node;
+    while(a && a->pLeft)
+    {
+        a=a->pLeft;
+    }
+    return a;
+    
+}
+Node*delete1(Node*node,int value)
+{
+    if(node==NULL)
+    return node;
+    else if(node->value<value)
+    {
+        node->pRight=delete1(node->pRight,value);
+    }
+    else if(node->value>value)
+    {
+        node->pLeft=delete1(node->pLeft,value);
+        
+    }
+    else
+    {
+        if (node->pLeft==NULL && node->pRight==NULL)
+        {
+            return NULL;
+        }
+        else if (node->pRight==NULL)
+        {
+            Node*temp=node->pLeft;
+            free(node);
+            return temp;
+        }
+        else if (node->pLeft==NULL)
+        {
+            Node*temp=node->pRight;
+            free(node);
+            return temp;
+        }
+        Node* temp = minNode(node->pRight);
+        node->value = temp->value;
+        node->pRight = delete1(node->pRight, temp->value);
+    
+    }
+    return node;
+}
+
+void deleteNode(T value){
+    root=delete1(root,value);
+    
+}
+
+3/
+
+bool test(Node*node)
+{
+    bool kq=true;
+    if (node==NULL)
+    return kq;
+    if(node->pLeft!=NULL && node->pLeft->value>node->value)
+    return false;
+    if(node->pRight!=NULL && node->pRight->value<node->value)
+    return false;
+    kq=test(node->pLeft);
+    kq=test(node->pRight);
+    return kq;
+}
+
+bool isBST() {
+    // TODO: return true if a tree is a BST; otherwise, return false.
+    return test(root);
+}
+
+// STUDENT ANSWER END
+
+4/
+
+// STUDENT ANSWER BEGIN
+// You can define other functions here to help you.
+bool findi(Node*node,int i)
+{
+    if(node==NULL)
+    return false;
+    if(i==node->value)
+    return true;
+    if(i<node->value)
+    {
+        return findi(node->pLeft,i);
+    }else return findi(node->pRight,i);
+}
+bool find(T i) {
+    return findi(root,i);
+}
+
+int sumRec(Node*node,T l,T r)
+{
+    int sum=0;
+    if(node==NULL)
+    return sum+0;
+    if(node->value<l || node->value>r)
+    sum+=0;
+    else 
+    sum+=node->value;
+    sum+=sumRec(node->pLeft,l,r);
+    sum+=sumRec(node->pRight,l,r);
+    return sum;
+}
+
+T sum(T l, T r) {
+    return sumRec(root,l,r);
+}
+
+5.1/
+
+// STUDENT ANSWER BEGIN
+// You can define other functions here to help you.
+int getH(Node*node)
+{
+    if (node==NULL)
+    return 0;
+    else
+    {
+        int Hleft=getH(node->pLeft);
+        int Hright=getH(node->pRight);
+        if(Hleft>Hright)
+        return 1+Hleft;
+        else return 1+Hright;
+    }
+}
+int getHeight() {
+    return getH(root);
+    
+}
+string Pre(Node*node)
+{
+    if (node==NULL)
+    return "";
+    return to_string(node->value) +" "+Pre(node->pLeft)+Pre(node->pRight);
+}
+string preOrder() {
+    return Pre(root);
+    
+}
+string In(Node*node)
+{
+    if (node==NULL)
+    return "";
+    return In(node->pLeft) +to_string(node->value)+" "+In(node->pRight);
+}
+string Po(Node*node)
+{
+    if (node==NULL)
+    return "";
+    return Po(node->pLeft) +Po(node->pRight)+to_string(node->value)+" ";
+}
+
+string inOrder() {
+    return In(root);
+    
+}
+
+string postOrder() {
+    // TODO: return the sequence of values of nodes in post-order.
+    return Po(root);
+}
+
+// STUDENT ANSWER END
+
+5.2/
+
+void sumOfLeaf(Node * node,int & sum)
+{
+    if(node==NULL)
+    return ;
+    if(node->pLeft==NULL && node->pRight==NULL)
+    sum+=node->value;
+    sumOfLeaf(node->pLeft,sum);
+    sumOfLeaf(node->pRight,sum);
+}
+
+int sumOfLeafs(){
+int k=0;
+sumOfLeaf(root,k);
+return k;
+    
+}
+
+5.3/
+
+int Count(Node*node)
+{
+    if(node==NULL)
+    return 0;
+    if(node->pLeft && node->pRight)
+    return 1+ Count(node->pLeft)+Count(node->pRight);
+    else return Count(node->pLeft)+Count(node->pRight);
+}
+
+int countTwoChildrenNode()
+{
+    return Count(root);
+}
+// STUDENT ANSWER END
