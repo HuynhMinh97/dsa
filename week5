@@ -1,0 +1,687 @@
+1.1/
+
+void insert(const T& value)
+{
+	bool t = false;
+	insert(root, value, t);
+}
+Node* insert(Node*& node, const T& value, bool& t)
+{
+	if (node == NULL)
+	{
+		node = new Node(value);
+		t = true;
+		return node;
+	}
+	if (node->data > value)
+	{
+		node->pLeft = insert(node->pLeft, value, t);
+		if (t)
+		{
+			if (node->balance == LH)
+				node = leftBalance(node, t);
+			else if (node->balance == EH)
+				node->balance = LH;
+			else
+			{
+				node->balance = EH;
+				t = false;
+			}
+		}
+	}
+	else if (node->data <= value)
+	{
+		node->pRight = insert(node->pRight, value, t);
+		if (t == true)
+		{
+			if (node->balance == LH)
+			{
+				node->balance = EH;
+				t = false;
+			}
+			else if (node->balance == EH)
+				node->balance = RH;
+			else
+				node = rightBalance(node, t);
+		}
+	}
+	return node;
+}
+
+Node* rightBalance(Node*& node, bool& t)
+{
+	Node* RightT = node->pRight;
+	if (RightT->balance == RH)
+	{
+		node = rotateLeft(node);
+		node->pLeft->balance = EH;	
+		RightT->balance = EH;          
+		t = false;
+	}
+	else if (RightT->balance == LH)
+	{
+		Node* LeftOfRight = RightT->pLeft;
+		if (LeftOfRight->balance == RH)
+		{
+			node->balance = LH;
+			RightT->balance = EH;
+		}
+		else if (LeftOfRight->balance == EH)
+		{
+			RightT->balance = EH;
+			node->balance = EH;
+		}
+		else
+		{
+			node->balance = EH;
+			RightT->balance = RH;
+		}
+		LeftOfRight->balance = EH;
+		node->pRight = rotateRight(RightT);
+		node = rotateLeft(node);
+		t = false;
+	}
+	return node;
+}
+
+Node* leftBalance(Node*& node, bool& t)
+{
+	Node* Left = node->pLeft;
+	if (Left->balance == LH)
+	{
+		node = rotateRight(node);
+		node->pRight->balance = EH;
+		Left->balance = EH;
+		t = false;
+	}
+	else if (node->pLeft->balance == RH)
+	{
+		Node* RightOfLeft = Left->pRight;
+		if (RightOfLeft->balance == LH)
+		{
+			node->balance = RH;
+			Left->balance = EH;
+		}
+		else if (RightOfLeft->balance == EH)
+		{
+			Left->balance = EH;
+			node->balance = EH;
+		}
+		else
+		{
+			node->balance = EH;
+			Left->balance = LH;
+		}
+		RightOfLeft->balance = EH;
+		node->pLeft = rotateLeft(Left);
+		node = rotateRight(node);
+		t = false;
+	}
+	return node;
+}
+Node* rotateRight(Node*& node)
+{
+	Node* L = node->pLeft;
+	node->pLeft = L->pRight;
+	L->pRight = node;
+	return L;
+
+}
+
+Node* rotateLeft(Node*& node)
+{
+	Node* R = node->pRight;
+	node->pRight = R->pLeft;
+	R->pLeft = node;
+	return R;
+}
+
+1.2/
+
+void remove(const int& value)
+{
+	bool sh = false;
+	bool su = false;
+	remove(root, value, sh, su);
+}
+Node* remove(Node*& node, const int& value, bool& sh, bool& su)
+{
+	if (node == NULL)
+	{
+		sh = false;
+		su = false;
+		return NULL;
+	}
+	if (value < node->data)
+	{
+		node->pLeft = remove(node->pLeft, value, sh, su);
+		if (sh)	node = removeRightBalance(node, sh);
+	}
+	else if (value > node->data)
+	{
+		node->pRight = remove(node->pRight, value, sh, su);
+		if (sh)	node = removeLeftBalance(node, sh);
+	}
+	// found node to delete
+	else
+	{
+		Node* deleteN = node;
+		if (deleteN->pRight == NULL)			
+		{
+			Node* nP = node->pLeft;
+			su = true;
+			sh = true;
+			node = nP;
+			deleteN->pLeft = NULL;
+			delete deleteN;
+			return nP;
+		}
+		else if (node->pLeft == NULL)		
+		{
+			Node* nR = node->pRight;
+			su = true;
+			sh = true;
+			deleteN->pRight = NULL;
+			delete deleteN;
+			return nR;
+		}
+		
+		else
+		{
+			Node* P = node->pLeft;
+			while (P->pRight != NULL)
+			{
+				P = P->pRight;
+			}
+			node->data = P->data;				
+			node->pLeft = remove(node->pLeft, P->data, sh, su);	
+
+			if (sh) node = removeRightBalance(node, sh);
+		}
+	}
+	return node;
+}
+Node* removeLeftBalance(Node*& node, bool& s)
+{
+	if (node->balance == RH)
+         node->balance = EH;
+	else if (node->balance == EH)
+	{
+		node->balance = LH;
+		s = false;
+	}
+	else
+	{
+		Node* Left = node->pLeft;
+		if ( Left->balance == RH)
+		{
+			Node* RightOfLeft = Left->pRight;
+			if (RightOfLeft->balance == RH)
+			{
+				Left->balance = LH;
+				node->balance = EH;
+			}
+			else if (RightOfLeft->balance == EH)
+			{
+				node->balance = RH;
+				Left->balance = EH;
+			}
+			else
+			{
+				node->balance = RH;
+				Left->balance = EH;
+			}
+			RightOfLeft->balance = EH;
+			node->pLeft = rotateLeft(Left);
+			node = rotateRight(node);
+		}
+		else
+		{
+			if ( Left->balance != EH)
+			{
+				node->balance = EH;
+				Left->balance = EH;
+			}
+			else 
+			{
+				node->balance = LH;
+				Left->balance = RH;
+				s = false;
+			}
+			node = rotateRight(node);
+		}
+	}
+	return node;
+}
+Node*removeRightBalance(Node*& node, bool& s)
+{
+	if (node->balance == LH)
+	node->balance = EH ;
+	else if (node->balance == EH)
+	{
+		node->balance = RH;
+		s = false;
+	}
+	else
+	{
+		Node* Right = node->pRight;
+		if (Right->balance == LH)
+		{
+			Node* LeftOfRight = Right->pLeft;
+			if (LeftOfRight->balance == LH)
+			{
+				Right->balance = RH;
+				node->balance = EH;
+			}
+			else if (LeftOfRight->balance == EH)
+			{
+				node->balance = LH;
+				Right->balance = EH;
+			}
+			else
+			{
+				node->balance = LH;
+				Right->balance = EH;
+			}
+			LeftOfRight->balance = EH;
+			node->pRight = rotateRight(Right);
+			node = rotateLeft(node);
+		}
+		else
+		{
+			if ( Right->balance != EH)
+			{
+				node->balance = EH;
+				Right->balance = EH;
+			}
+			else
+			{
+				node->balance = RH;
+				Right->balance = LH;
+				s = false;
+			}
+			node = rotateLeft(node);
+		}
+	}
+	return node;
+}
+
+2.1/
+
+void reheapDown(int maxHeap[], int numberOfElements, int index)
+{
+    int k;
+    if(index*2+1>=numberOfElements||index*2+2>=numberOfElements||numberOfElements==0)
+    return;
+    else
+    {
+        if(maxHeap[index]<maxHeap[index*2+1] 
+        && maxHeap[index]<maxHeap[index*2+2]
+        && maxHeap[index*2+1]<maxHeap[index*2+2] )
+        {
+            k=maxHeap[index];
+            maxHeap[index]=maxHeap[index*2+2];
+            maxHeap[index*2+2]=k;
+            return reheapDown(maxHeap,numberOfElements,index*2+2);
+        }
+        if(maxHeap[index]<maxHeap[index*2+1] 
+        && maxHeap[index]<maxHeap[index*2+2]
+        && maxHeap[index*2+1]>maxHeap[index*2+2] )
+        {
+            k=maxHeap[index];
+            maxHeap[index]=maxHeap[index*2+1];
+            maxHeap[index*2+1]=k;
+            return reheapDown(maxHeap,numberOfElements,index*2+1);
+        }
+    }
+}
+
+
+void reheapUp(int maxHeap[], int numberOfElements, int index)
+{
+    int k=0;
+    bool kq=false;
+    for(int i=0;i<numberOfElements-1;i++)
+    {
+        if(maxHeap[i]==index)
+        {
+            kq=true;
+            break;
+        }
+    }
+    if(index<0||kq==false)
+    return;
+    else
+    {
+        if(maxHeap[index]>maxHeap[(index-1)/2] 
+         )
+        {
+            k=maxHeap[index];
+            maxHeap[index]=maxHeap[(index-1)/2];
+            maxHeap[(index-1)/2]=k;
+            return reheapUp(maxHeap,numberOfElements,(index-1)/2);
+        }
+        
+    }
+}
+
+2.2/
+
+template<class T>
+void Heap<T>::push(T item){
+    ensureCapacity(count+1);
+    elements[count] = item;
+    reheapUp(count);
+    count ++;
+ 
+    
+}
+
+template<class T>
+void Heap<T>::ensureCapacity(int minCapacity){
+if (minCapacity > capacity)
+{
+
+T newcapacity = capacity*3/2;
+
+T *newdata = new T[newcapacity]; 
+memmove(newdata,elements,count*sizeof(T));
+capacity = newcapacity;
+delete[] elements;
+elements = newdata;
+}
+}
+
+template<class T>
+void Heap<T>::reheapUp(int position){
+    if (count == 0) return;
+    if (position == 0) return;
+    int parent = ( position-1)/2;
+    if (elements[parent] < elements[position])
+        {
+            swap(elements[parent], elements[position]);
+            reheapUp(parent);
+        }
+}
+
+2.3/
+
+template<class T>
+int Heap<T>::getItem(T item) {
+        if (count == 0) return -1;
+    for (int i=0;i<count;i++)
+        if (elements[i] == item)
+        {
+            return i;
+            break;
+        }
+return -1;
+}
+
+template<class T>
+void Heap<T>::remove(T item) {
+    int index = getItem(item);
+    if (getItem(item) == -1)
+        return;
+    if(count==1)
+    count=0;
+    else{
+    elements[index] = elements[count-1];
+    count-=1;
+    reheapDown(index);}
+}
+
+template<class T>
+void Heap<T>::clear() {
+    count = 0;
+}
+
+3/
+
+static void ReHeapDown(T* start, T notLeave, T size)
+	{
+		int m = notLeave;
+		int ch1 = notLeave * 2 + 1;
+		int ch2 = notLeave * 2 + 2;
+		if (ch1 < size && start[notLeave] < start[ch1])
+			m = ch1;
+		if (ch2 < size)
+		{
+			int Max;
+			if (start[ch1] > start[ch2])
+				Max = ch1;
+			else
+				Max = ch2;
+			if (start[Max] > start[notLeave])
+				m = Max;
+		}
+		if (m != notLeave)
+		{
+			swap(start[m], start[notLeave]);
+			ReHeapDown(start, m, size);
+		}
+	}
+
+
+static void heapSort(T* start, T* end)
+	{
+		int size = end - start;
+		for (int i = size / 2 - 1; i >= 0; i--)
+		{
+			ReHeapDown(start, i, size);
+		}
+		while (size - 1 > 0)
+		{
+			swap(start[0], start[size - 1]);
+			size -= 1;
+			ReHeapDown(start, 0, size );
+			
+		}
+		Sorting<T>::printArray(start, end);
+	}
+ 
+ 
+4.1/
+
+static void sortSegment(T* start, T* end, int segment_idx, int cur_segment_total)
+    {
+        if  (segment_idx!=cur_segment_total)
+    {
+        int n=end - start;
+        T tem=0;
+        for (int i=0; i<n-segment_idx; i++)
+            
+            if (start[i]>start[i+segment_idx])
+            {
+                tem=start[i]; 
+                start[i]=start[i+segment_idx]; 
+                start[i+segment_idx]=tem;
+            } 
+        for (int i=0; i<n-segment_idx; i++)
+            
+            if (start[i]>start[i+segment_idx])
+            {
+                tem=start[i]; 
+                start[i]=start[i+segment_idx]; 
+                start[i+segment_idx]=tem;
+            } 
+        for (int i=0; i<n-segment_idx; i++)
+            
+            if (start[i]>start[i+segment_idx])
+            {
+                tem=start[i]; 
+                start[i]=start[i+segment_idx]; 
+                start[i+segment_idx]=tem;
+            }
+        for (int i=0; i<n-segment_idx; i++)
+            
+            if (start[i]>start[i+segment_idx])
+            {
+                tem=start[i]; 
+                start[i]=start[i+segment_idx]; 
+                start[i+segment_idx]=tem;
+            }
+           
+        cout <<segment_idx<<" segments: ";
+        printArray(start,end);
+    }
+    }
+
+static void ShellSort(T* start, T* end, int* num_segment_list, int num_phases) 
+{
+    int cur = end-start;
+    for (int i=num_phases-1;i>=0;i--)
+    {
+        sortSegment(start,end,num_segment_list[i],cur);
+        cur=num_segment_list[i];
+    }
+}
+
+4.2/
+
+template <class T>
+void Sorting<T>::selectionSort(T *start, T *end)
+{
+int k=end-start;
+int min,index,tem;
+for(int i=0;i<k-1;i++)
+    {
+    min=*(start+i);
+    index=i;
+        for(int j=i+1;j<k;j++)
+        {
+            if(min>*(start+j))
+            {
+               min=*(start+j);
+               index=j;
+            }
+        }
+    if(index!=i)
+    {
+    tem=*(start+i);
+    *(start+index)=tem;
+    *(start+i)=min;
+    }
+    printArray(start,end);
+    }
+    
+    
+}
+
+4.3/
+
+template <class T>
+void SLinkedList<T>::bubbleSort()
+{
+bool swap = false;
+    if(count==0)
+    {
+    printList();
+    return;
+    }
+    for (int i=0; i<count-1;i++)
+    {
+        swap=true;
+        Node* pre = head;
+        for (int j=i;j<count-1;j++)
+        {
+            if (pre->data>pre->next->data)
+            {
+                T tem;
+                tem = pre->data;
+                pre->data = pre->next->data;
+                pre->next->data = tem;
+                swap=true;
+            }
+            pre = pre->next;
+        }
+        if(swap == false) break;
+        printList();
+        }
+}
+
+5.1/
+
+static T* Partition(T* start, T* end) {
+    T tem;
+    int i = 1;
+    int j = end-start-1;
+    T pivot= *start;
+    while (j-i!=-1)
+    {
+        if (*(start+i)>pivot && *(start+j)<pivot)
+        {
+            tem=*(start+i); 
+            *(start+i)=*(start+j); 
+            *(start+j)=tem;
+        }
+        if (*(start+i)<=pivot) i++;
+        if (*(start+j)>=pivot) j--;
+    } 
+    tem=*(start); 
+    *(start)=*(start+j); 
+    *(start+j)=tem; 
+    return start+j;    
+}
+
+static void QuickSort(T* start, T* end) {
+    T size = end - start;
+    if (size==0) return;
+    T *pivot = Partition (start,end);
+    cout <<pivot-start<<" ";
+    if (pivot!=start) 
+        QuickSort(start,pivot);
+    if (pivot!=end) 
+        QuickSort(pivot+1,end);
+}
+
+5.2/
+
+template <class T>
+T *Sorting<T>::Partition(T *start, T *end)
+{
+    T tmp;
+    int i = 1;
+    int j = end-start-1;
+    T pivot= *start;
+    while (j-i!=-1)
+    {
+        if (*(start+i)>pivot && *(start+j)<pivot)
+        {
+            tmp=*(start+i); 
+            *(start+i)=*(start+j); 
+            *(start+j)=tmp;
+        }
+        if (*(start+i)<=pivot) i++;
+        if (*(start+j)>=pivot) j--;
+    } 
+    tmp=*(start); 
+    *(start)=*(start+j); 
+    *(start+j)=tmp; 
+    return start+j;
+}
+
+template <class T>
+void Sorting<T>::insertionSort(T *start, T *end)
+{
+    
+    cout <<"Insertion sort: ";
+    printArray(start,end);
+}
+
+template <class T>
+void Sorting<T>::hybridQuickSort(T *start, T *end, int min_size)
+{
+    int m = end - start;
+    if (m==0) return;
+    if (m < min_size) 
+        insertionSort(start,end);
+    else 
+    {   
+        cout <<"Quick sort: ";
+        printArray(start,end);
+        T *pivot = Partition (start,end);
+        if (pivot!=start) hybridQuickSort(start,pivot,min_size);
+        if (pivot!=end) hybridQuickSort(pivot+1,end,min_size);
+    }
+}
