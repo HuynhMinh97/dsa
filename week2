@@ -1,0 +1,419 @@
+1/
+template <class T>
+void SLinkedList<T>::add(const T& e) {
+    Node*tmp=new Node(e);
+        if(count==0)
+        {
+        head=tmp;
+        tail=tmp;
+        }else
+        {
+        tail->next=tmp;
+        tail=tmp;
+        }
+        this->count++;
+    
+    
+}
+
+template<class T>
+void SLinkedList<T>::add(int index, const T& e) {
+        Node*tmp=new Node(e);
+        if(index<0 || index>this->count)
+        throw std::out_of_range("Loi1");
+        if(this->count==0)
+        {
+        head=tmp;
+        tail=tmp;
+        }
+        else if(index==0)
+        {
+        tmp->next=head;
+        head=tmp;
+        }
+        else if(index==this->count)
+        {
+        tail->next=tmp;
+        tail=tmp;
+        }
+        else{
+        Node*pre=head;
+        for(int i=0;i<index-1;i++)
+        {
+        pre=pre->next;
+        }
+        tmp->next=pre->next;
+        pre->next=tmp;
+        }
+        this->count++;
+    
+}
+
+template<class T>
+int SLinkedList<T>::size() { 
+    return this->count;
+}
+
+2/
+void Polynomial::insertTerm(const Term& term) {
+    // STUDENT ANSWER
+}
+
+void Polynomial::insertTerm(double coeff, int exp) {
+    if (exp<0)
+    {return;}
+    Term newTerm(coeff, exp);
+  if(this->terms->size()==0)
+  {
+    this->terms->add(newTerm);
+    }
+    else 
+    { int size = this->terms->size();
+        bool flag = false;
+        for (int i=0;i<size;i++)
+        {
+        if (newTerm.exp == this->terms->get(i).exp)
+            {
+            newTerm.coeff = coeff + this->terms->get(i).coeff;
+            this->terms->set(i,newTerm);
+            flag=true;
+            break;
+            }
+        }
+        if (flag ==false)
+        {this->terms->add(0,newTerm);}
+    }
+ int size = this->terms->size();
+ for (int i=0; i<size;i++)
+ { if (this->terms->get(i).coeff==0)
+    { this->terms->removeAt(i);
+        i=0;
+        size= this->terms->size();
+    }
+ }
+ for (int i=0; i<size;i++)
+ { Term new0 = this->terms->get(i);
+    int index=i;
+    for(int j=i+1;j<size;j++)
+    { Term new1 = this->terms->get(j);
+    if(new1.exp > new0.exp)
+        {index=j;
+        new0=new1;
+        }
+    }
+    Term new1 = this->terms->get(i);
+    this->terms->set(i,new0);
+    this->terms->set(index,new1);
+    
+ }
+ 
+ 
+}
+3.1/
+
+template <class T>
+void DLinkedList<T>::add(const T& e) {
+    Node *newNode = new Node(e);
+if (this->count==0)
+ {
+  head = newNode;
+  tail = newNode;
+ }
+ else
+ {
+    tail->next=newNode;
+    newNode->previous=tail;
+    tail=newNode;
+ }
+ this->count++;
+ 
+    
+}
+
+template<class T>
+void DLinkedList<T>::add(int index, const T& e) {
+   if (index <0 || index > this->count)
+ {throw std::out_of_range("..");}
+ if (this->count==0)
+    {
+        add(e);
+        
+    }
+ else if (index==0)
+ {  Node *newNode = new Node(e);
+    newNode->next=head;
+    head->previous=newNode;
+    head=newNode;
+    this->count++;
+ }
+ else if (index == this->count)
+    {
+        add(e);
+        
+    }
+else
+{ 
+    Node *newNode = new Node(e);
+    Node*pre = new Node;
+    pre=head;
+    for (int i=0;i<index-1;i++)
+    {pre=pre->next;}
+    newNode->next=pre->next;
+    newNode->previous=pre;
+    pre->next->previous=newNode;
+    pre->next=newNode;
+    pre=NULL;
+    delete[] pre;
+    this->count++;
+} 
+}
+
+template<class T>
+int DLinkedList<T>::size() {
+   
+    return this->count;
+}
+
+3.2/
+
+template <class T>
+T DLinkedList<T>::removeAt(int index)
+{
+    if (index <0 || index >= this->count || this->count==0)
+        {throw std::out_of_range("...");}
+    Node*tmp = new Node;
+     T data_re = get(index);
+     if (this->count == 1)
+     {
+        tmp=head;
+        head =NULL;
+        tail=NULL;
+     }
+     else if (index==0)
+     {  tmp=head;
+        head=head->next;
+        tmp->next=NULL;
+        head->previous =NULL;
+     }
+     else if (index == this->count-1)
+     {  tmp=tail;
+        tail=tmp->previous;
+        tmp->previous=NULL;
+        tail->next =NULL;
+     }
+     else
+     { tmp=head;
+        Node*ttemp;
+        
+        for(int i=0;i<index-1;i++)
+            {tmp=tmp->next;}
+            
+        ttemp=tmp->next;
+        tmp->next=ttemp->next;
+        ttemp->next->previous=tmp;
+        ttemp->next=NULL;
+        ttemp->previous=NULL;
+        delete[]ttemp;
+        tmp=NULL;
+     }
+        delete[] tmp;
+        this->count--;
+        return data_re;
+      /* Remove element at index and return removed value */
+    }
+
+
+template <class T>
+bool DLinkedList<T>::removeItem(const T& item)
+{
+    if (contains(item))
+        {removeAt(indexOf(item));
+        return true;}
+    else
+        return false;
+    /* Remove the first apperance of item in list and return true, otherwise return false */
+    
+}
+
+template<class T>
+void DLinkedList<T>::clear(){
+    while(this->count !=0)
+       { removeAt(0);}
+    /* Remove all elements in list */
+}
+ 3.3/
+ template<class T>
+T DLinkedList<T>::get(int index) {
+  if (index<0 || index>=this->count || this->count==0)
+    { throw std:: out_of_range("...");}
+    if (index==0)
+    { return head->data;}
+    else if (index == this->count-1)
+        { return tail->data;}
+    else 
+    {
+        Node*pre =new Node;
+        pre =head;
+        for (int i=0;i<index;i++)
+        { pre=pre->next;}
+        T data_get = pre->data;
+        pre =NULL;
+        delete[] pre;
+        return data_get;
+    }  
+}
+
+template <class T>
+void DLinkedList<T>::set(int index, const T& e) {
+    if (index<0 || index>=this->count || this->count==0)
+    { throw std:: out_of_range("...");}
+    int size = this->count;
+    if(index==0)
+        { head->data = e;}
+    else if (index == size-1)
+        {tail->data=e;}
+    else if ( (size-1)/ index >=2)
+        {
+            Node*pre=head;
+            for (int i=0;i<index;i++)
+            {pre=pre->next;}
+            pre->data=e;
+            pre=NULL;
+            delete[] pre;
+        }
+    else
+        {
+            Node*pre=tail;
+            for (int i=0;i< (size-index-1);i++)
+            {pre=pre->previous;}
+            pre->data = e;
+            pre=NULL;
+            delete[] pre;
+        }
+    }
+
+template<class T>
+bool DLinkedList<T>::empty() {
+    /* Check if the list is empty or not. */
+    return (this->count==0);
+    
+}
+
+template<class T>
+int DLinkedList<T>::indexOf(const T& item) {
+    /* Return the first index wheter item appears in list, otherwise return -1 */
+    int size = this->count;
+Node*pre=head;
+ for (int i=0;i<size;i++)
+    {
+    if(pre->data == item)
+        {
+            pre=NULL;
+            delete[] pre;
+            return i;
+        }
+        pre=pre->next;
+    }
+    pre=NULL;
+    delete[] pre;
+    return -1;
+}
+
+template<class T>
+bool DLinkedList<T>::contains(const T& item) {
+    /* Check if item appears in the list */
+    Node *pre= head;
+int size = this->count;
+for (int i=0;i<size;i++)
+    { 
+        if(pre->data == item)
+        {
+            pre=NULL;
+            delete[] pre;
+            return true;
+        }
+        pre=pre->next;
+    }
+    pre=NULL;
+    delete[] pre;
+    return false;
+}
+
+4/
+
+DataLog::DataLog()
+{
+     logList.push_back(0);
+    currentState = logList.begin();
+}
+
+DataLog::DataLog(const int &data)
+{
+    /*
+     * TODO:  add the first state with data
+     */
+     logList.push_back(data);
+    currentState = logList.begin();
+}
+
+void DataLog::addCurrentState(int number)
+{
+    /*
+     * TODO: Increase the value of current state by number
+     */
+     *currentState += number;
+}
+
+void DataLog::subtractCurrentState(int number)
+{
+    /*
+     * TODO: Decrease the value of current state by number
+     */
+     *currentState -= number;
+}
+
+void DataLog::save()
+{
+    /*
+     * TODO: This function will create a new state, copy the data of the currentState
+     *       and move the currentState Iterator to this new state. If there are other states behind the 
+     *       currentState Iterator, we delete them all before creating a new state.
+     */
+     int data = *currentState;
+    if (currentState != --logList.end())
+    {
+        logList.erase(++currentState, logList.end());
+    }
+    logList.push_back(data);
+    currentState= --logList.end();
+    return;
+}
+
+void DataLog::undo()
+{
+    /*
+     * TODO: Switch to the previous state of the data
+     *       If this is the oldest state in the log, nothing changes
+     */
+     if (currentState == logList.begin())
+    {
+        return;
+    }
+    else
+    {
+        --currentState;
+    }
+}
+
+void DataLog::redo()
+{
+    /*
+     * TODO: Switch to the latter state of the data
+     *       If this is the latest state in the log, nothing changes
+     */
+      if (currentState != --logList.end())
+    {
+        ++currentState;
+    }
+    return;
+}
