@@ -1,0 +1,131 @@
+
+Bài 1:
+if(opt==0)
+myfunc=add;
+else if(opt==1)
+myfunc=minus;
+else if(opt==2)
+myfunc=multiply;
+else myfunc=divide;
+
+Bài 2:
+void ascendingSort(int a[], int n) {
+    int k;
+    for(int i=0;i<n;i++)
+    {
+    for(int j=0;j<n-i;j++)
+    {
+    if(a[i]>a[i+j])
+    {k=a[i+j];
+    a[i+j]=a[i];
+    a[i]=k;
+    }
+    }
+}}
+
+void descendingSort(int a[], int n) {
+    int k;
+    for(int i=0;i<n;i++)
+    {
+    for(int j=0;j<n-i;j++)
+    {
+    if(a[i]<a[i+j])
+    {k=a[i+j];
+    a[i+j]=a[i];
+    a[i]=k;
+    }
+    }
+}}
+
+void mySort(int a[], int n, void (*sort)(int[], int)) {
+	sort(a,n);
+}
+
+Bài 3:
+int findMax(int* arr, int length)
+{
+    if (length==0)
+        return arr[0];
+    return max(arr[length-1], findMax(arr, length-1));
+    
+}
+
+Bài 4:
+string deleteSpace(string a,int i)
+{
+    if(a[i]==' ')
+    {
+    a.erase(i,1);
+    i++;
+    return deleteSpace(a,i);
+    }
+    i++;
+    if(i<(int)a.length())
+    return deleteSpace(a,i);
+    return a;
+    
+}
+bool Palindrome(string str) 
+{ 
+int a=str.length();
+if(a<=1){
+return true;
+}
+if(str[0]!=str[a-1]){
+return false;
+}
+string middle=str.substr(1,a-2);
+return Palindrome(middle);
+
+}
+bool isPalindrome(string str)
+{
+   string m=deleteSpace(str,0);
+   return Palindrome(m);
+}
+
+Bài 5:
+int countWaySum(int x, int num) 
+{ 
+    // Base cases 
+    int val = (x - pow(num, 2)); 
+    if (val == 0) 
+        return 1; 
+    if (val < 0) 
+        return 0; 
+  
+   
+    return countWaySum(val, num + 1) + 
+           countWaySum(x, num + 1); 
+} 
+  
+
+int countWaySumOfSquare(int x) 
+{ 
+    return countWaySum(x,1); 
+}
+
+Bài 6:
+
+bool Match(char* text, char* pattern)
+{
+    if(*text=='\0' && *pattern!='\0')
+    return false;
+    if(*pattern=='\0')
+    return true;
+    if(*text==*pattern)
+    return Match(text+1,pattern +1);
+    return false;
+}
+bool containsPattern(char* text, char* pattern)
+{
+    if (*text == '\0') 
+        return false; 
+    if (*text == *pattern) 
+       { if(Match(text, pattern)) 
+            return true; 
+        else
+          return containsPattern(text + 1, pattern); }
+  
+     return containsPattern(text + 1, pattern); 
+}
